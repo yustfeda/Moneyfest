@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catatan Keuangan Profesional</title>
+    <!-- Tailwind CSS CDN untuk styling cepat dan responsif -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Mengatur font Inter sebagai default untuk tampilan yang profesional */
+        body {
+            font-family: "Inter", sans-serif;
+        }
+
+        /* Container utama dengan latar belakang gradien yang menarik */
+        .container-wrapper {
+            background: linear-gradient(to right bottom, #c6f6d5, #9ae6b4); /* Gradien hijau lembut */
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start; /* Sejajarkan ke atas */
+            justify-content: center;
+            padding: 15px; /* Padding sedikit lebih kecil untuk mobile */
+        }
+
+        /* Styling kartu utama yang menampung konten aplikasi */
+        .card {
+            background-color: #ffffff;
+            border-radius: 1.5rem; /* Sudut lebih membulat */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); /* Bayangan yang lebih menonjol */
+            padding: 2rem; /* Padding sedikit lebih kecil */
+            width: 100%;
+            max-width: 1000px; /* Lebar maksimal yang lebih luas untuk desktop */
+            margin: auto;
+            position: relative; /* Diperlukan untuk notifikasi */
+            min-height: 80vh; /* Tinggi minimum agar terlihat baik */
+        }
+
+        /* Tombol navigasi pada header */
+        .nav-button {
+            background-color: transparent;
+            color: #4a5568; /* Warna teks abu-abu gelap */
+            font-weight: 600;
+            padding: 0.6rem 1.2rem; /* Ukuran tombol lebih kecil */
+            border-radius: 0.75rem;
+            transition: all 0.2s ease;
+            font-size: 0.9rem; /* Ukuran font lebih kecil */
+        }
+
+        .nav-button:hover {
+            background-color: #f7fafc; /* Latar belakang sedikit terang saat hover */
+            color: #2d3748; /* Teks lebih gelap saat hover */
+            transform: translateY(-2px);
+        }
+
+        .nav-button.active {
+            background-color: #38a169; /* Warna hijau solid untuk tombol aktif */
+            color: white;
+            box-shadow: 0 4px 10px rgba(56, 161, 105, 0.3);
+        }
+
+        .nav-button.active:hover {
+            background-color: #2f855a;
+            transform: translateY(0); /* Tidak ada efek melayang saat aktif */
+        }
+
+        /* Styling untuk tombol submit */
+        .btn-submit {
+            padding: 0.6rem 1.2rem; /* Ukuran tombol lebih kecil */
+            border-radius: 0.75rem;
+            color: white;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            font-size: 0.9rem; /* Ukuran font lebih kecil */
+        }
+
+        .btn-submit-income {
+            background-color: #38a169; /* Warna hijau untuk pemasukan */
+        }
+
+        .btn-submit-income:hover {
+            background-color: #2f855a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(56, 161, 105, 0.3);
+        }
+
+        .btn-submit-expense {
+            background-color: #e53e3e; /* Warna merah untuk pengeluaran */
+        }
+
+        .btn-submit-expense:hover {
+            background-color: #c53030;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(229, 62, 62, 0.3);
+        }
+
+        /* Styling input field */
+        .input-field {
+            border: 1px solid #cbd5e0; /* Border abu-abu terang */
+            border-radius: 0.5rem;
+            padding: 0.6rem 0.8rem; /* Padding lebih kecil */
+            font-size: 0.9rem; /* Ukuran teks yang tidak terlalu besar */
+            width: 100%;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #48bb78;
+            box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.2);
+        }
+
+        /* Styling kartu rekap */
+        .recap-card {
+            background-color: #f7fafc;
+            border-radius: 0.75rem;
+            padding: 1.2rem; /* Padding lebih kecil */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .recap-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.12);
+        }
+
+        .recap-label {
+            color: #718096;
+            font-size: 0.85rem; /* Ukuran font lebih kecil */
+            margin-bottom: 0.4rem;
+        }
+
+        .recap-amount {
+            font-size: 1.5rem; /* Ukuran teks lebih terukur */
+            font-weight: 700;
+        }
+
+        .income-text { color: #38a169; }
+        .expense-text { color: #e53e3e; }
+        .balance-text { color: #3182ce; }
+
+        /* Styling tabel transaksi */
+        .transaction-table-container {
+            overflow-x: auto; /* Memungkinkan scroll horizontal untuk tabel */
+            -webkit-overflow-scrolling: touch; /* Untuk scroll yang lebih baik di perangkat sentuh */
+            margin-top: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .transaction-table {
+            width: 100%;
+            border-collapse: separate; /* Untuk radius sudut */
+            border-spacing: 0;
+            min-width: 650px; /* Lebar minimum agar kolom tidak terlalu sempit di mobile */
+        }
+
+        .transaction-table th, .transaction-table td {
+            padding: 0.8rem 1rem; /* Padding lebih kecil */
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .transaction-table th {
+            background-color: #edf2f7; /* Latar belakang header tabel */
+            font-weight: 700;
+            color: #4a5568;
+            font-size: 0.8rem; /* Ukuran font lebih kecil */
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .transaction-table tbody tr {
+            background-color: #ffffff;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .transaction-table tbody tr:hover {
+            background-color: #f7fafc;
+            transform: translateY(-2px);
+        }
+
+        .transaction-table td {
+            font-size: 0.85rem; /* Ukuran font lebih kecil */
+            color: #4a5568;
+        }
+
+        .transaction-table td:last-child {
+            text-align: center; /* Tombol hapus di tengah */
+        }
+
+        /* Styling tombol hapus dalam tabel */
+        .delete-btn-table {
+            background: none;
+            border: none;
+            color: #e53e3e;
+            font-size: 1.1rem; /* Ukuran icon lebih kecil */
+            cursor: pointer;
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
+
+        .delete-btn-table:hover {
+            transform: scale(1.2);
+            color: #c53030;
+        }
+
+        /* Notifikasi sukses/error */
+        .notification {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            color: white;
+            font-weight: 600;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            transform: translateY(-20px);
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notification.success { background-color: #38a169; }
+        .notification.error { background-color: #e53e3e; }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .card {
+                padding: 1.5rem;
+            }
+            .recap-amount {
+                font-size: 1.3rem; /* Lebih kecil di mobile */
+            }
+            .transaction-table th, .transaction-table td {
+                padding: 0.6rem 0.8rem; /* Padding lebih rapat di mobile */
+            }
+            .transaction-table th {
+                font-size: 0.75rem;
+            }
+            .transaction-table td {
+                font-size: 0.8rem;
+            }
+            .nav-button {
+                font-size: 0.85rem;
+                padding: 0.5rem 0.8rem;
+            }
+            .btn-submit {
+                font-size: 0.85rem;
+                padding: 0.5rem 0.8rem;
+            }
+            .input-field {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 antialiased">
+
+<div class="container-wrapper">
+    <div class="card">
+        <!-- Header aplikasi dengan navigasi -->
+        <header class="flex flex-col md:flex-row items-center justify-between mb-8 pb-4 border-b border-gray-200">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-4 md:mb-0">Catatan Keuangan</h1>
+            <nav class="flex space-x-2">
+                <button id="nav-input" class="nav-button active">Input Transaksi</button>
+                <button id="nav-rekap" class="nav-button">Rekapitulasi & Riwayat</button>
+            </nav>
+        </header>
+
+        <!-- Area notifikasi -->
+        <div id="notification-area" class="notification hidden"></div>
+
+        <!-- Bagian Input Transaksi -->
+        <section id="input-section" class="mb-10">
+            <h2 class="text-xl md:text-2xl font-bold mb-6 text-gray-700">Masukkan Transaksi Baru</h2>
+            <form id="entry-form" class="space-y-4">
+                <input type="text" id="description" placeholder="Deskripsi (ex: Gaji, Belanja Makanan)" required class="input-field">
+                <input type="number" id="amount" placeholder="Jumlah (angka)" required class="input-field">
+                <select id="type" required class="input-field">
+                    <option value="income">Pemasukan</option>
+                    <option value="expense">Pengeluaran</option>
+                </select>
+                <input type="date" id="transaction-date" required class="input-field">
+                <button type="submit" id="add-btn" class="w-full btn-submit btn-submit-income">Tambah Transaksi</button>
+            </form>
+        </section>
+
+        <!-- Bagian Rekapitulasi & Riwayat -->
+        <section id="rekap-section" class="hidden">
+            <!-- Ringkasan Keuangan Keseluruhan -->
+            <h2 class="text-xl md:text-2xl font-bold mb-6 text-gray-700">Ringkasan Keuangan Keseluruhan</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="recap-card">
+                    <div class="recap-label">Total Pemasukan</div>
+                    <div class="recap-amount income-text" id="total-income">Rp 0</div>
+                </div>
+                <div class="recap-card">
+                    <div class="recap-label">Total Pengeluaran</div>
+                    <div class="recap-amount expense-text" id="total-expense">Rp 0</div>
+                </div>
+                <div class="recap-card">
+                    <div class="recap-label">Saldo Keseluruhan</div>
+                    <div class="recap-amount balance-text" id="total-balance">Rp 0</div>
+                </div>
+            </div>
+
+            <hr class="my-6 border-gray-200">
+
+            <!-- Filter Bulan dan Rekap Bulanan -->
+            <h2 class="text-xl md:text-2xl font-bold mb-4 text-gray-700">Rekapitulasi Bulanan</h2>
+            <div class="mb-6 flex flex-col md:flex-row items-center gap-4">
+                <label for="month-filter" class="text-gray-700 font-medium text-sm md:text-base">Pilih Bulan & Tahun:</label>
+                <select id="month-filter" class="input-field max-w-xs md:max-w-none w-full">
+                    <!-- Options akan dihasilkan secara dinamis oleh JavaScript -->
+                </select>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="recap-card">
+                    <div class="recap-label">Pemasukan Bulan Terpilih</div>
+                    <div class="recap-amount income-text" id="monthly-income">Rp 0</div>
+                </div>
+                <div class="recap-card">
+                    <div class="recap-label">Pengeluaran Bulan Terpilih</div>
+                    <div class="recap-amount expense-text" id="monthly-expense">Rp 0</div>
+                </div>
+                <div class="recap-card">
+                    <div class="recap-label">Saldo Bulan Terpilih</div>
+                    <div class="recap-amount balance-text" id="monthly-balance">Rp 0</div>
+                </div>
+            </div>
+
+            <!-- Riwayat Transaksi dalam bentuk tabel -->
+            <h2 class="text-xl md:text-2xl font-bold mb-6 text-gray-700">Riwayat Transaksi Bulan Terpilih</h2>
+            <div class="transaction-table-container">
+                <table class="transaction-table">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Deskripsi</th>
+                            <th>Tipe</th>
+                            <th>Jumlah</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="entries-table-body">
+                        <!-- Entries will be loaded here -->
+                        <tr id="no-transactions-message" class="bg-gray-50 hidden">
+                            <td colspan="5" class="text-center text-gray-500 py-4">Belum ada transaksi di bulan ini.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Mendapatkan elemen-elemen DOM
+        const navInputBtn = document.getElementById('nav-input');
+        const navRekapBtn = document.getElementById('nav-rekap');
+        const inputSection = document.getElementById('input-section');
+        const rekapSection = document.getElementById('rekap-section');
+
+        const entryForm = document.getElementById('entry-form');
+        const descriptionInput = document.getElementById('description');
+        const amountInput = document.getElementById('amount');
+        const typeInput = document.getElementById('type');
+        const dateInput = document.getElementById('transaction-date');
+        const addBtn = document.getElementById('add-btn');
+
+        // Elemen rekap overall
+        const totalIncomeEl = document.getElementById('total-income');
+        const totalExpenseEl = document.getElementById('total-expense');
+        const totalBalanceEl = document.getElementById('total-balance');
+
+        // Elemen filter bulan
+        const monthFilterSelect = document.getElementById('month-filter');
+
+        // Elemen rekap bulanan
+        const monthlyIncomeEl = document.getElementById('monthly-income');
+        const monthlyExpenseEl = document.getElementById('monthly-expense');
+        const monthlyBalanceEl = document.getElementById('monthly-balance');
+
+        const entriesTableBody = document.getElementById('entries-table-body');
+        const noTransactionsMessage = document.getElementById('no-transactions-message');
+        const notificationArea = document.getElementById('notification-area');
+
+        // Menginisialisasi tanggal default ke hari ini
+        dateInput.valueAsDate = new Date();
+
+        // Mengambil data transaksi dari LocalStorage, atau array kosong jika belum ada
+        let entries = JSON.parse(localStorage.getItem('financialEntries')) || [];
+
+        // State untuk filter bulan yang sedang aktif di halaman rekap
+        let currentFilterMonth = new Date().getMonth(); // 0-11
+        let currentFilterYear = new Date().getFullYear();
+
+        /**
+         * Fungsi untuk menampilkan notifikasi di UI.
+         * @param {string} message - Pesan notifikasi.
+         * @param {string} type - Tipe notifikasi ('success' atau 'error').
+         */
+        function showNotification(message, type) {
+            notificationArea.textContent = message;
+            notificationArea.className = `notification ${type}`; // Set tipe CSS
+            notificationArea.classList.add('show');
+            notificationArea.classList.remove('hidden');
+
+            setTimeout(() => {
+                notificationArea.classList.remove('show');
+                notificationArea.classList.add('hidden');
+            }, 3000); // Notifikasi akan hilang setelah 3 detik
+        }
+
+        /**
+         * Fungsi untuk memformat angka menjadi mata uang Rupiah.
+         * @param {number} amount - Jumlah uang.
+         * @returns {string} - String mata uang yang diformat.
+         */
+        const formatCurrency = (amount) => {
+            return `Rp ${new Intl.NumberFormat('id-ID').format(amount)}`;
+        };
+
+        /**
+         * Fungsi untuk mengupdate warna tombol submit berdasarkan tipe transaksi yang dipilih.
+         */
+        function updateButtonColor() {
+            if (typeInput.value === 'income') {
+                addBtn.className = 'w-full btn-submit btn-submit-income';
+            } else {
+                addBtn.className = 'w-full btn-submit btn-submit-expense';
+            }
+        }
+
+        // Event listener untuk perubahan tipe transaksi pada formulir
+        typeInput.addEventListener('change', updateButtonColor);
+        // Panggil saat awal untuk memastikan warna tombol benar saat halaman dimuat
+        updateButtonColor();
+
+        /**
+         * Fungsi untuk menghasilkan opsi filter bulan/tahun secara dinamis
+         * berdasarkan data transaksi yang ada.
+         */
+        function generateMonthFilterOptions() {
+            monthFilterSelect.innerHTML = ''; // Bersihkan opsi sebelumnya
+            const months = ['Januari', 'Februari', 'Desember', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Maret'];
+            const uniqueMonthsYears = new Set(); // Untuk menyimpan kombinasi unik bulan-tahun
+
+            entries.forEach(entry => {
+                const entryDate = new Date(entry.date);
+                const month = entryDate.getMonth();
+                const year = entryDate.getFullYear();
+                uniqueMonthsYears.add(`${month}-${year}`);
+            });
+
+            // Tambahkan bulan saat ini jika belum ada (untuk memastikan filter selalu ada opsi bulan ini)
+            const today = new Date();
+            uniqueMonthsYears.add(`${today.getMonth()}-${today.getFullYear()}`);
+
+            const sortedMonthsYears = Array.from(uniqueMonthsYears)
+                .map(item => {
+                    const [month, year] = item.split('-');
+                    return { month: parseInt(month), year: parseInt(year) };
+                })
+                .sort((a, b) => {
+                    if (a.year !== b.year) {
+                        return b.year - a.year; // Urutkan tahun menurun
+                    }
+                    return b.month - a.month; // Urutkan bulan menurun
+                });
+
+            sortedMonthsYears.forEach(item => {
+                const option = document.createElement('option');
+                option.value = `${item.month}-${item.year}`;
+                option.textContent = `${months[item.month]} ${item.year}`;
+                monthFilterSelect.appendChild(option);
+            });
+
+            // Set nilai filter bulan ke bulan saat ini atau bulan pertama dari data
+            const defaultFilterValue = `${currentFilterMonth}-${currentFilterYear}`;
+            if (monthFilterSelect.querySelector(`option[value="${defaultFilterValue}"]`)) {
+                monthFilterSelect.value = defaultFilterValue;
+            } else if (sortedMonthsYears.length > 0) {
+                 // Jika bulan saat ini tidak ada di data, gunakan bulan paling baru dari data
+                const latestMonthYear = sortedMonthsYears[0];
+                monthFilterSelect.value = `${latestMonthYear.month}-${latestMonthYear.year}`;
+                currentFilterMonth = latestMonthYear.month;
+                currentFilterYear = latestMonthYear.year;
+            } else {
+                // Jika tidak ada data sama sekali, tampilkan bulan ini
+                monthFilterSelect.value = `${today.getMonth()}-${today.getFullYear()}`;
+            }
+        }
+
+        /**
+         * Fungsi untuk merender semua entri transaksi ke dalam tabel dan mengupdate rekapitulasi.
+         */
+        function renderEntries() {
+            entriesTableBody.innerHTML = ''; // Bersihkan isi tabel
+
+            let overallIncome = 0;
+            let overallExpense = 0;
+            let monthlyIncome = 0;
+            let monthlyExpense = 0;
+            let filteredMonthlyEntries = [];
+
+            // Hitung rekapitulasi keseluruhan
+            entries.forEach(entry => {
+                if (entry.type === 'income') {
+                    overallIncome += entry.amount;
+                } else {
+                    overallExpense += entry.amount;
+                }
+            });
+
+            // Update rekapitulasi keseluruhan
+            totalIncomeEl.textContent = formatCurrency(overallIncome);
+            totalExpenseEl.textContent = formatCurrency(overallExpense);
+            totalBalanceEl.textContent = formatCurrency(overallIncome - overallExpense);
+
+            // Filter entri berdasarkan bulan/tahun yang dipilih untuk rekap bulanan
+            const [selectedMonthStr, selectedYearStr] = monthFilterSelect.value.split('-');
+            const selectedMonth = parseInt(selectedMonthStr);
+            const selectedYear = parseInt(selectedYearStr);
+
+            filteredMonthlyEntries = entries.filter(entry => {
+                const entryDate = new Date(entry.date);
+                return entryDate.getMonth() === selectedMonth && entryDate.getFullYear() === selectedYear;
+            });
+
+            // Hitung rekapitulasi bulanan dari entri yang sudah difilter
+            if (filteredMonthlyEntries.length === 0) {
+                noTransactionsMessage.classList.remove('hidden');
+                entriesTableBody.appendChild(noTransactionsMessage);
+            } else {
+                noTransactionsMessage.classList.add('hidden');
+                // Urutkan entri bulanan berdasarkan tanggal terbaru
+                const sortedMonthlyEntries = [...filteredMonthlyEntries].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                sortedMonthlyEntries.forEach((entry) => {
+                    const tableRow = document.createElement('tr');
+
+                    // Format tanggal agar lebih mudah dibaca
+                    const entryDate = new Date(entry.date);
+                    const formattedDate = entryDate.toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                    });
+
+                    // Tentukan kelas CSS untuk jumlah berdasarkan tipe transaksi
+                    const amountClass = entry.type === 'income' ? 'income-text' : 'expense-text';
+
+                    tableRow.innerHTML = `
+                        <td>${formattedDate}</td>
+                        <td>${entry.description}</td>
+                        <td>${entry.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}</td>
+                        <td class="${amountClass}">${formatCurrency(entry.amount)}</td>
+                        <td>
+                            <button class="delete-btn-table" data-id="${entry.id}">&times;</button>
+                        </td>
+                    `;
+                    entriesTableBody.appendChild(tableRow);
+
+                    // Hitung total pemasukan dan pengeluaran bulanan
+                    if (entry.type === 'income') {
+                        monthlyIncome += entry.amount;
+                    } else {
+                        monthlyExpense += entry.amount;
+                    }
+                });
+            }
+
+            // Update rekapitulasi bulanan
+            const monthlyBalance = monthlyIncome - monthlyExpense;
+            monthlyIncomeEl.textContent = formatCurrency(monthlyIncome);
+            monthlyExpenseEl.textContent = formatCurrency(monthlyExpense);
+            monthlyBalanceEl.textContent = formatCurrency(monthlyBalance);
+
+            // Simpan data ke LocalStorage setelah rendering atau perubahan
+            localStorage.setItem('financialEntries', JSON.stringify(entries));
+        }
+
+        // Tangani pengiriman formulir
+        entryForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Validasi input
+            if (!descriptionInput.value.trim() || amountInput.value <= 0 || isNaN(amountInput.value)) {
+                showNotification('Deskripsi tidak boleh kosong dan Jumlah harus angka positif.', 'error');
+                return;
+            }
+
+            const newEntry = {
+                id: Date.now(), // Menggunakan timestamp sebagai ID unik
+                description: descriptionInput.value,
+                amount: parseFloat(amountInput.value),
+                type: typeInput.value,
+                date: dateInput.value
+            };
+
+            entries.push(newEntry); // Tambahkan entri baru ke array
+            generateMonthFilterOptions(); // Regenerate options for filter
+            renderEntries(); // Render ulang tampilan
+            showNotification('Transaksi berhasil ditambahkan!', 'success');
+
+            // Bersihkan formulir dan reset ke nilai default
+            descriptionInput.value = '';
+            amountInput.value = '';
+            typeInput.value = 'income';
+            dateInput.valueAsDate = new Date();
+            updateButtonColor();
+        });
+
+        // Tangani tombol hapus di tabel riwayat transaksi
+        entriesTableBody.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-btn-table')) {
+                const entryIdToDelete = parseInt(e.target.dataset.id);
+                // Filter array `entries` untuk menghapus entri yang dipilih
+                entries = entries.filter(entry => entry.id !== entryIdToDelete);
+                generateMonthFilterOptions(); // Regenerate options for filter
+                renderEntries(); // Render ulang tampilan setelah penghapusan
+                showNotification('Transaksi berhasil dihapus!', 'success');
+            }
+        });
+
+        // Event listener untuk perubahan filter bulan
+        monthFilterSelect.addEventListener('change', (e) => {
+            const [month, year] = e.target.value.split('-');
+            currentFilterMonth = parseInt(month);
+            currentFilterYear = parseInt(year);
+            renderEntries(); // Render ulang tampilan dengan filter baru
+        });
+
+
+        /**
+         * Fungsi untuk mengganti tampilan antara Input dan Rekap.
+         * @param {string} view - 'input' atau 'rekap'.
+         */
+        function switchView(view) {
+            if (view === 'input') {
+                inputSection.classList.remove('hidden');
+                rekapSection.classList.add('hidden');
+                navInputBtn.classList.add('active');
+                navRekapBtn.classList.remove('active');
+            } else if (view === 'rekap') {
+                inputSection.classList.add('hidden');
+                rekapSection.classList.remove('hidden');
+                navInputBtn.classList.remove('active');
+                navRekapBtn.classList.add('active');
+                generateMonthFilterOptions(); // Pastikan opsi filter bulan terbaru
+                renderEntries(); // Pastikan data terbaru ditampilkan saat beralih ke rekap
+            }
+        }
+
+        // Event listener untuk tombol navigasi
+        navInputBtn.addEventListener('click', () => switchView('input'));
+        navRekapBtn.addEventListener('click', () => switchView('rekap'));
+
+        // Panggil saat halaman dimuat pertama kali untuk inisialisasi
+        generateMonthFilterOptions(); // Buat opsi filter bulan pertama kali
+        renderEntries(); // Render semua entri (untuk rekap keseluruhan)
+        switchView('input'); // Tampilkan bagian input secara default saat pertama kali dimuat
+    });
+</script>
+
+</body>
+</html>
